@@ -41,7 +41,7 @@ public class DataAccessObject {
                 params,
                 (rs, rowNum) -> {
                     String product_name = rs.getString("product_name");
-                    return new Order(product_name);
+                    return new Order(product_name).getProduct_name();
                 }).toString();
     }
 }

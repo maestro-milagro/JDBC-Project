@@ -1,5 +1,6 @@
 package com.maestro.JDBCProject.controller;
 
+import com.maestro.JDBCProject.model.Order;
 import com.maestro.JDBCProject.repository.DataAccessObject;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
