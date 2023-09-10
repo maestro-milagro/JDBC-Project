@@ -1,6 +1,9 @@
 package com.maestro.JDBCProject.repository;
 
 import com.maestro.JDBCProject.model.Order;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.catalina.valves.StuckThreadDetectionValve;
@@ -21,27 +24,32 @@ import java.util.stream.Collectors;
 @Repository
 @Data
 public class DataAccessObject {
-    private final String scriptFileName = "select.sql";
-    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+//    private final String scriptFileName = "select.sql";
+//    private final String scriptFileName = read("select.sql");
+//    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    @PersistenceContext
+    private final EntityManager entityManager;
 
-    private static String read(String scriptFileName) {
-        try (InputStream is = new ClassPathResource(scriptFileName).getInputStream();
-             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is))) {
-            return bufferedReader.lines().collect(Collectors.joining("\n"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    private static String read(String scriptFileName) {
+//        try (InputStream is = new ClassPathResource(scriptFileName).getInputStream();
+//             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is))) {
+//            return bufferedReader.lines().collect(Collectors.joining("\n"));
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
     public String getProductName(String name){
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
-        return namedParameterJdbcTemplate.query(
-                read(scriptFileName),
-                params,
-                (rs, rowNum) -> {
-                    String product_name = rs.getString("product_name");
-                    return new Order(product_name).getProduct_name();
-                }).toString();
+        return entityManager.createNativeQuery(String.format("SELECT product_name FROM orders LEFT JOIN customers ON orders.customer_id = customers.id WHERE LOWER(cus_name) = '%s'", name)).getResultList().toString();
+
+//        Map<String, String> params = new HashMap<>();
+//        params.put("name", name);
+//        return namedParameterJdbcTemplate.query(
+//                scriptFileName,
+//                params,
+//                (rs, rowNum) -> {
+//                    String product_name = rs.getString("product_name");
+//                    return new Order(product_name).getProduct_name();
+//                }).toString();
     }
 }
